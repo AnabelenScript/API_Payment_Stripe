@@ -5,6 +5,7 @@ export interface CreateSessionParams {
   userId: string;
   plan: PlanType;
   billingCycle: BillingCycle;
+  stripePriceId: string;
 }
 
 export interface PaymentGatewayPort {

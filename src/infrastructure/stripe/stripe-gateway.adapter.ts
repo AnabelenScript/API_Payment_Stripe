@@ -23,14 +23,12 @@ export class StripeGatewayAdapter implements PaymentGatewayPort {
   }
 
   async createCheckoutSession(params: CreateSessionParams): Promise<{ url: string; sessionId: string }> {
-    const priceId = `price_${params.plan}_${params.billingCycle}`;
-
     const session = await this.stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       mode: 'subscription', // Using subscription for recurring plans
       line_items: [
         {
-          price: priceId,
+          price: params.stripePriceId,
           quantity: 1,
         },
       ],

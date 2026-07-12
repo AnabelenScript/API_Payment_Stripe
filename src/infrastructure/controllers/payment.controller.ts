@@ -7,6 +7,7 @@ export class CreateSessionDto {
   userId: string;
   plan: PlanType;
   billingCycle: BillingCycle;
+  stripePriceId: string;
 }
 
 @Controller('payments')
