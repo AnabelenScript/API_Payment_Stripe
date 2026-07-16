@@ -36,6 +36,10 @@ export class HandleWebhookUseCase {
           
           this.logger.log(`Successfully processed payment for user ${metadata.userId}`);
         }
+      } else if (event.type === 'customer.subscription.deleted') {
+        const subscription = event.data.object as any;
+        await this.mainApiNotifier.notifySubscriptionDeleted(subscription.id);
+        this.logger.log(`Successfully processed cancellation for subscription ${subscription.id}`);
       }
     } catch (error) {
       this.logger.error(`Error processing webhook: ${error.message}`, error.stack);

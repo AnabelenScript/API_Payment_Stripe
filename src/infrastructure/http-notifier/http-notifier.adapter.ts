@@ -30,4 +30,19 @@ export class HttpMainApiNotifier implements MainApiNotifierPort {
       throw error;
     }
   }
+
+  async notifySubscriptionDeleted(stripeSubscriptionId: string): Promise<void> {
+    try {
+      const url = `${this.mainApiUrl}/api/v1/internal/webhooks/subscription-deleted`;
+      await firstValueFrom(this.httpService.post(url, { stripeSubscriptionId }, {
+        headers: {
+          'x-api-key': this.configService.get<string>('MAIN_API_KEY', 'default-secret-key'),
+        }
+      }));
+      this.logger.log(`Notified main API about deleted subscription ${stripeSubscriptionId}`);
+    } catch (error) {
+      this.logger.error(`Failed to notify main API about deleted subscription: ${error.message}`);
+      throw error;
+    }
+  }
 }

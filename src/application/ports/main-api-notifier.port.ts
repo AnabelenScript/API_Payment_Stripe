@@ -13,6 +13,7 @@ export interface PaymentSuccessPayload {
 
 export interface MainApiNotifierPort {
   notifyPaymentSuccess(payload: PaymentSuccessPayload): Promise<void>;
+  notifySubscriptionDeleted(stripeSubscriptionId: string): Promise<void>;
 }
 
 export const MainApiNotifierPort = Symbol('MainApiNotifierPort');
