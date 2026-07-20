@@ -56,11 +56,14 @@ export class StripeGatewayAdapter implements PaymentGatewayPort {
   }
 
   async getSubscriptionStatusByUserId(userId: string): Promise<any> {
+    this.logger.log(`Querying Stripe for active subscriptions of user: ${userId}`);
     const subscriptions = await this.stripe.subscriptions.search({
       query: `metadata['userId']:'${userId}' AND status:'active'`,
       limit: 1,
       expand: ['data.latest_invoice.payment_intent'],
     });
+
+    this.logger.log(`Stripe returned ${subscriptions.data.length} active subscriptions for user ${userId}`);
 
     if (subscriptions.data.length > 0) {
       const sub = subscriptions.data[0];
@@ -75,7 +78,7 @@ export class StripeGatewayAdapter implements PaymentGatewayPort {
         stripe_customer_id: sub.customer as string,
         stripe_subscription_id: sub.id,
         latest_stripe_payment_intent_id: paymentIntentId,
-        paid_at: new Date((sub as any).current_period_start * 1000).toISOString(),
+        paid_at: new Date(((sub as any).current_period_start || (sub as any).created || Math.floor(Date.now() / 1000)) * 1000).toISOString(),
       };
     }
 
