@@ -11,6 +11,7 @@ export interface CreateSessionParams {
 export interface PaymentGatewayPort {
   createCheckoutSession(params: CreateSessionParams): Promise<{ url: string; sessionId: string }>;
   constructEventFromPayload(signature: string, payload: Buffer): any;
+  getSubscriptionStatusByUserId(userId: string): Promise<any>;
 }
 
 export const PaymentGatewayPort = Symbol('PaymentGatewayPort');

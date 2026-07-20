@@ -37,6 +37,13 @@ export class StripeGatewayAdapter implements PaymentGatewayPort {
         plan: params.plan,
         billingCycle: params.billingCycle,
       },
+      subscription_data: {
+        metadata: {
+          userId: params.userId,
+          plan: params.plan,
+          billingCycle: params.billingCycle,
+        }
+      },
       success_url: this.configService.get<string>('SUCCESS_URL', 'http://localhost:3000/success'),
       cancel_url: this.configService.get<string>('CANCEL_URL', 'http://localhost:3000/cancel'),
     });
@@ -46,5 +53,32 @@ export class StripeGatewayAdapter implements PaymentGatewayPort {
 
   constructEventFromPayload(signature: string, payload: Buffer): any {
     return this.stripe.webhooks.constructEvent(payload, signature, this.webhookSecret);
+  }
+
+  async getSubscriptionStatusByUserId(userId: string): Promise<any> {
+    const subscriptions = await this.stripe.subscriptions.search({
+      query: `metadata['userId']:'${userId}' AND status:'active'`,
+      limit: 1,
+      expand: ['data.latest_invoice.payment_intent'],
+    });
+
+    if (subscriptions.data.length > 0) {
+      const sub = subscriptions.data[0];
+      const latestInvoice = sub.latest_invoice as any;
+      const paymentIntentId = latestInvoice?.payment_intent?.id || '';
+
+      return {
+        hasActiveSubscription: true,
+        user_id: sub.metadata.userId,
+        plan: sub.metadata.plan,
+        billing_cycle: sub.metadata.billingCycle,
+        stripe_customer_id: sub.customer as string,
+        stripe_subscription_id: sub.id,
+        latest_stripe_payment_intent_id: paymentIntentId,
+        paid_at: new Date((sub as any).current_period_start * 1000).toISOString(),
+      };
+    }
+
+    return { hasActiveSubscription: false };
   }
 }

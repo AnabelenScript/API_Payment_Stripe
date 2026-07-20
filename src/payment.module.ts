@@ -7,6 +7,7 @@ import { MainApiNotifierPort } from './application/ports/main-api-notifier.port'
 
 import { CreatePaymentSessionUseCase } from './application/use-cases/create-payment-session.use-case';
 import { HandleWebhookUseCase } from './application/use-cases/handle-webhook.use-case';
+import { CheckSubscriptionUseCase } from './application/use-cases/check-subscription.use-case';
 
 import { StripeGatewayAdapter } from './infrastructure/stripe/stripe-gateway.adapter';
 import { HttpMainApiNotifier } from './infrastructure/http-notifier/http-notifier.adapter';
@@ -26,6 +27,7 @@ import { WebhookController } from './infrastructure/controllers/webhook.controll
   providers: [
     CreatePaymentSessionUseCase,
     HandleWebhookUseCase,
+    CheckSubscriptionUseCase,
     {
       provide: PaymentGatewayPort,
       useClass: StripeGatewayAdapter,
