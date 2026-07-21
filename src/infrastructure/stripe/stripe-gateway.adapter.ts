@@ -84,4 +84,13 @@ export class StripeGatewayAdapter implements PaymentGatewayPort {
 
     return { hasActiveSubscription: false };
   }
+
+  async cancelSubscription(stripeSubscriptionId: string, cancelAtPeriodEnd: boolean): Promise<any> {
+    this.logger.log(`Canceling subscription ${stripeSubscriptionId}, cancelAtPeriodEnd: ${cancelAtPeriodEnd}`);
+    if (cancelAtPeriodEnd) {
+      return await this.stripe.subscriptions.update(stripeSubscriptionId, { cancel_at_period_end: true });
+    } else {
+      return await this.stripe.subscriptions.cancel(stripeSubscriptionId);
+    }
+  }
 }
